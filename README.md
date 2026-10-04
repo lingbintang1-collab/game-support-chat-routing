@@ -6,21 +6,21 @@ Run the command that a maintainer will use:
 INFRAI_API_KEY=... node src/main.ts "I found a cheat"
 ```
 
-I hacked this together last weekend to handle player questions about generated game assets. The snippet below accepts a player message, opens a private realtime channel, and fires an event. Infrai keeps that whole flow behind one key and one API surface, which saved me from wiring up separate providers. The service picks a moderation queue when the text has `cheat`; everything else lands in `support`.
+This example accepts a player message about a generated game asset, creates a private realtime channel, and publishes an event. Infrai keeps that workflow behind one key and one API surface. The service chooses a moderation queue when the text contains `cheat`; other messages go to `support`.
 
 ## Request boundary
 
-`supportMessage` is a zod schema with `playerId`, `assetId`, and `text`. Parsed values turn into the event payload, and `playerId` hands over `account_id`. Channel names come from the player id, so ops can check presence through the matching realtime endpoint.
+`supportMessage` is a zod schema with `playerId`, `assetId`, and `text`. The parsed values become the event data, while `playerId` supplies `account_id`. Channel names are derived from the player, so operators can inspect presence with the matching realtime endpoint.
 
 ## Verify locally
 
-I wrote a small test that checks the queue switch and the publish shape:
+The focused test exercises the queue decision and confirms the publish request shape:
 
 ```sh
 node src/support_chat.test.ts
 ```
 
-To hit a real env, export `INFRAI_API_KEY` and optionally `PLAYER_ID`, then pass the player message as args. It prints the chosen channel and queue as JSON.
+For a live request, export `INFRAI_API_KEY` and optionally `PLAYER_ID`, then pass the player's message as command arguments. The process prints the selected channel and queue as JSON.
 
 ## Files
 
